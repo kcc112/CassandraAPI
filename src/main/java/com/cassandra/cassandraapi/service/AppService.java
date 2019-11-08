@@ -21,7 +21,11 @@ public class AppService implements IAppService {
 
     @Override
     public void addApp(App app) {
-        appRepository.save(app);
+        String newAppTitle = app.getAppTitle();
+        Optional<App> currentApp = getAppByName(newAppTitle);
+        if (currentApp.isEmpty()) {
+            appRepository.save(app);
+        }
     }
 
     @Override
@@ -43,6 +47,6 @@ public class AppService implements IAppService {
 
     @Override
     public void updateApp(App app) {
-
+        appRepository.save(app);
     }
 }

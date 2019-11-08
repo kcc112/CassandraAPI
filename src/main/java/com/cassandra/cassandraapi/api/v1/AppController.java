@@ -23,7 +23,7 @@ public class AppController {
         return appService.getAllApps();
     }
 
-    @GetMapping(value = "{appName}")
+    @GetMapping(path = "{appName}")
     public App getAppByName(@PathVariable String appName) {
         return appService.getAppByName(appName).orElse(null);
     }
@@ -33,9 +33,14 @@ public class AppController {
         appService.addApp(app);
     }
 
-    @DeleteMapping(value = "{appName")
+    @DeleteMapping(path = "delete/{appName}")
     public void deleteApp(@PathVariable String appName) {
         appService.deleteApp(appName);
+    }
+
+    @PutMapping(path = "update")
+    public void updateApp(@RequestBody App app) {
+        appService.updateApp(app);
     }
 
 
