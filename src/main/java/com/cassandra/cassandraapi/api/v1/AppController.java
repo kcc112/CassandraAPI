@@ -33,15 +33,13 @@ public class AppController {
         appService.addApp(app);
     }
 
-    @DeleteMapping(path = "delete/{appName}")
+    @DeleteMapping(path = "{appName}")
     public void deleteApp(@PathVariable String appName) {
         appService.deleteApp(appName);
     }
 
-    @PutMapping(path = "update")
+    @PutMapping
     public void updateApp(@RequestBody App app) {
         appService.updateApp(app);
     }
-
-
 }
