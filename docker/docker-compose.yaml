@@ -1,0 +1,62 @@
+version: '3.7'
+
+# containers configuration
+services:
+  # api container
+  java-crud:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    # to reach a container from the host ports must be expose
+    ports:
+      - "8080:8080"
+    # create a dependency chain
+    depends_on:
+      - "cassandra-seed"
+    environment:
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+      REPLICATION_FACTOR: 3
+
+  cassandra-seed:
+    image: cassandra:latest
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 0 && /docker-entrypoint.sh cassandra -f"
+    # Network for the nodes to communicate
+    ports:
+      - "9042:9042"
+    environment:
+      HEAP_NEWSIZE: "1M"
+      MAX_HEAP_SIZE: "200M"
+      # variable is the comma-separated list of IP addresses used by gossip for bootstrapping new nodes joining a cluster
+      CASSANDRA_SEEDS: "cassandra-seed"
+      # sets the name of the cluster
+      CASSANDRA_CLUSTER_NAME: "AppStoreCluster"
+      # data center name of this node
+      CASSANDRA_DC: "center1"
+      # automatically updates updates all nodes when adding new done
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+
+  cassandra-node-1:
+    image: cassandra:latest
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 60 && /docker-entrypoint.sh cassandra -f"
+    environment:
+      HEAP_NEWSIZE: "1M"
+      MAX_HEAP_SIZE: "200M"
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_CLUSTER_NAME: "AppStoreCluster"
+      CASSANDRA_DC: "center1"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+    depends_on:
+      - cassandra-seed
+
+  cassandra-node-2:
+    image: cassandra:latest
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 120 && /docker-entrypoint.sh cassandra -f"
+    environment:
+      HEAP_NEWSIZE: "1M"
+      MAX_HEAP_SIZE: "200M"
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_CLUSTER_NAME: "AppStoreCluster"
+      CASSANDRA_DC: "center1"
+      CASSANDRA_ENDPOINT_SNITCH: "GossipingPropertyFileSnitch"
+    depends_on:
+      - cassandra-seed
